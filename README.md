@@ -7,11 +7,11 @@ simply submit the script to the GPU clusters is okay.
 ## 1. Installation
 You can use the following command to install JSNMF:
 ```
-pip3 install JSNMF
+pip3 install jsnmfpy
 ```
 
 ## 2. Example
 
-You can refer to [here](https://github.com/ZexuanSun/JSNMF/blob/main/Example/demo_jsnmf.ipynb) for a simple illustration of the use of JSNMF.
+You can refer to [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Example/demo_jsnmf.ipynb) for a simple illustration of the use of JSNMF.
 
 ## 3. Reference 
