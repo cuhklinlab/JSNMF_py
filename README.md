@@ -1,5 +1,5 @@
 # JSNMF
-JSNMF: Joint analysis of scRNA-seq and epigenomic-seq data via semi-orthogonal nonnegative matrix factorization
+JSNMF: Joint analysis of scRNA-seq and epigenomic-seq data via semi-orthogonal nonnegative matrix factorization.
 
 This is the Python implementation of the JSNMF algorithm. Note that this implementation can employ GPU to speed up the code, just 
 simply submit the script to the GPU clusters is okay.
