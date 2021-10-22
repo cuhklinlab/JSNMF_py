@@ -10,7 +10,7 @@ import bct
 import umap,random
 import matplotlib.pyplot as plt
 
-
+#plt.rcParams['figure.dpi'] = 200
 torch.set_default_dtype(torch.float64)
 
 class JSNMF:
@@ -113,7 +113,7 @@ class JSNMF:
 		alpha = (err1 + err2) / err3
 		gamma = torch.abs((err1 + err2) / err4)
 		alpha = alpha / 10
-		gamma = gamma / 1000000
+		gamma = gamma / 10
 
 		return alpha,gamma,Inits 
 
@@ -276,7 +276,7 @@ class JSNMF:
 
 		return result
 
-	def cluster(self, S, K = 50, step = 0.01, upper = 4):
+	def cluster(self, S, K = 50, step = 0.01, start = 2.7, upper = 4 ,seed = 3):
 
 		'''
 		Use louvain to cluster the cells based on the complete graph S, note that
@@ -285,15 +285,20 @@ class JSNMF:
 
 		Parameters
 		----------
-		S     : (N, N) torch.tensor, the complete graph
-		K     : (0, N) int, parameter of Wtrim
+		S      : (N, N) torch.tensor, the complete graph
+		K      : (0, N) int, parameter of Wtrim
 			     Number of neighbors to retain
-		step  :  the step of binary search to find the partition, default 0.01
-		upper :  the upper bound of the reolution paramter to be searched
+		step   :  the step of binary search to find the partition, default 0.01
+		start  :  start searching point of binary search
+		upper  :  the upper bound of the reolution paramter to be searched
+		seed   : seed parameter for louvain algorithm
 
 		Returns
 		-------
 		res_clu : resulting cluster labels for each cell
+
+		Note that sometimes exact number of clusters as true labels may not be found, paramters
+		need to be adjusted then, like step, seed and upper
 
 		'''
 		A = Wtrim(S, K = 50)
@@ -301,9 +306,9 @@ class JSNMF:
 
 		num_c = self.num_c
 
-		tmp_gamma = 1.7
+		tmp_gamma = start
 		#use louvain to cluster based on A
-		clusters, q_stat = bct.community_louvain(A,gamma = tmp_gamma,seed = 0)
+		clusters, q_stat = bct.community_louvain(A,gamma = tmp_gamma, seed = seed)
 		tmp_c = len(np.unique(clusters))
 		tmp_clu = clusters
 
@@ -319,19 +324,19 @@ class JSNMF:
 			if tmp_c < num_c:
 				tmp_gamma = tmp_gamma + step
 			else:
-				tmp_res = tmp_res - step
+				tmp_gamma = tmp_gamma - step
 
-			if tmp_res < 0 or tmp_res > upper:
+			if tmp_gamma < 0 or tmp_gamma > upper:
 				break
 			tmp_gamma = round(tmp_gamma,2)
 			#print(tmp_res)
-			clusters, q_stat = bct.community_louvain(A,gamma = tmp_gamma,seed = 0)
+			clusters, q_stat = bct.community_louvain(A,gamma = tmp_gamma,seed = seed)
 			tmp_c = len(np.unique(clusters))
 			tmp_clu = clusters
 
 		return res_clu
 
-	def visualize(self, S, label,**kwarg):
+	def visualize(self, S, label, tag = False, **kwarg):
 
 		'''
 		Visualize based on the complete graph S using Umap
@@ -340,6 +345,7 @@ class JSNMF:
 		----------
 		S         : (N, N) np.ndarray, the complete graph
 		label     : array, true or clustered (louvain result) labels for each cell
+		tag		  : if recalculte umap embedding
 		**kwarg   : kwarg for the umap 	    
 
 		Returns
@@ -348,16 +354,25 @@ class JSNMF:
 
 		'''
 
+
+		#transfer S to distance matrix first
+		data = 1-S
+		data = data-np.diag(data.diagonal())
+		reducer = umap.UMAP(**kwarg)
+
 		# avoid recompute umap embedding
 		if self.embedding is None:
-			data = 1-S
-			data = data-np.diag(data.diagonal())
 			#min_dist = 0.68, n_neighbors=12
-			reducer = umap.UMAP(**kwarg)
+			embedding = reducer.fit_transform(data)
+			self.embedding = embedding
+
+		# recaculate embedding if needed
+		if tag is True:
 			embedding = reducer.fit_transform(data)
 			self.embedding = embedding
 
 
+		#plt.figure(figsize=(3, 1.5), dpi=300)
 		#visualize
 		for i in range(1,label.max() + 1):
 			ind = label == i
