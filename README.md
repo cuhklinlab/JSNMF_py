@@ -24,7 +24,10 @@ The `result` is a dict, and the major output of JSNMF, the complete graph S, can
 ```
 S = result['S']
 ```
+`JSNMF` class also has other methods, you can use the `help` command for more details explanations of the methods.
 
-You can refer to [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Example/demo_jsnmf.ipynb) for a simple illustration of the use of this package, with clustering and visualization results shown .
+You can refer to [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Example/demo_jsnmf.ipynb) for a simple illustration of the use of this package, with clustering and visualization results shown. 
+
+If you have any questions about the source code, please feel free to contact me :).
 
 
