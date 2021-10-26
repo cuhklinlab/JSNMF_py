@@ -11,10 +11,16 @@ pip install JSNMF-py
 ```
 
 ## 2. Usage
-The main class `JSNMF` needs to be initialized with at least two [annda.AnnData](https://anndata.readthedocs.io/en/latest/anndata.AnnData.html#anndata.AnnData), for`RNA`, and `ATAC` data, or data from two modalities, respectively. The preprocessed data is stored in `RNA.X` and `ATAC.X`. And the true cell labels should be kept in `RNA.obs['celltype']`. The default number of maximum epochs to run, i.e. the `max_epochs` parameter, is set as 200.  
-
-
-
+The main class `JSNMF` needs to be initialized with at least two [annda.AnnData](https://anndata.readthedocs.io/en/latest/anndata.AnnData.html#anndata.AnnData), for`RNA`, and `ATAC` data, or data from two modalities, respectively. The preprocessed data is stored in `RNA.X` and `ATAC.X`. And the true cell labels should be kept in `RNA.obs['celltype']`. Note that the data preprocessing process is done with R. The default number of maximum epochs to run, i.e. the `max_epochs` parameter, is set as 200. So it is quite simple to initialize a JSNMF model with the following code:
+```
+from JSNMF.model import JSNMF
+test_model = JSNMF(rna,atac)
+```
+After initializing, run the model is also quite easy: 
+```
+result = test_model.run()
+```
+The `result` is a dict, and the major output of JSNMF, the complete graph S, can be get by `S = result['S']`.
 
 
 You can refer to [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Example/demo_jsnmf.ipynb) for a simple illustration of the use of JSNMF.
