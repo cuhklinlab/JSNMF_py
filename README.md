@@ -20,9 +20,11 @@ After initializing, run the model is also quite easy:
 ```
 result = test_model.run()
 ```
-The `result` is a dict, and the major output of JSNMF, the complete graph S, can be get by `S = result['S']`.
+The `result` is a dict, and the major output of JSNMF, the complete graph S, can be get with easy access:
+```
+S = result['S']
+```
 
-
-You can refer to [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Example/demo_jsnmf.ipynb) for a simple illustration of the use of JSNMF.
+You can refer to [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Example/demo_jsnmf.ipynb) for a simple illustration of the use of JSNMF, with clustering and visualization results shown .
 
 
