@@ -24,7 +24,7 @@ The `result` is a dict, and the major output of JSNMF, the complete graph S, can
 ```
 S = result['S']
 ```
-`JSNMF` class also has other methods, you can use the `help` command for more details explanations of the methods.
+`JSNMF` class also has other methods, you can use the `help` or `?` command for more details explanations of the methods.
 
 
 ## 3. Example
