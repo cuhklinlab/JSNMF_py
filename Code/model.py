@@ -9,8 +9,10 @@ from scipy.sparse import isspmatrix
 import bct
 import umap,random
 import matplotlib.pyplot as plt
+import os
+import pandas as pd
 
-#plt.rcParams['figure.dpi'] = 200
+
 torch.set_default_dtype(torch.float64)
 
 class JSNMF:
@@ -185,7 +187,7 @@ class JSNMF:
 			W2 = W2 * (X2@H2) / tmp2
 			
 
-			#update H1, H2
+			# update H1, H2
 			W1tW1 = W1.T @ W1
 			W2tW2 = W2.T @ W2
 			H1tH1 = H1.T @ H1
@@ -200,7 +202,7 @@ class JSNMF:
 			tmp_nume_2 = alpha * S.T@H2 + X2.T @ W2 + gamma * theta2.square() * A2@H2 + yita2 * H2
 			H2 = H2 * (tmp_nume_2 / tmp_deno_2)
 
-			#update S
+			# update S
 			H1tH1 = H1@H1.T 
 			H2tH2 = H2@H2.T
 			Q = 1/2 * (H1tH1 + H2tH2)
@@ -250,7 +252,6 @@ class JSNMF:
 		result  :  dict storing some information during the model running
 
 		'''
-		#history = {}
 		start = time.time()
 		alpha, gamma, Inits = self.parameter_selection()
 		end = time.time()
@@ -274,9 +275,10 @@ class JSNMF:
 					init_t = self.init_t,
 					run_t  = self.run_t)
 
-		return result
+		self.result = result
+		#return result
 
-	def cluster(self, S, K = 50, step = 0.01, start = 2.7, upper = 4 ,seed = 3):
+	def cluster(self, K = 50, step = 0.01, start = 2.7, upper = 4 ,seed = 3):
 
 		'''
 		Use louvain to cluster the cells based on the complete graph S, note that
@@ -285,7 +287,6 @@ class JSNMF:
 
 		Parameters
 		----------
-		S      : (N, N) torch.tensor, the complete graph
 		K      : (0, N) int, parameter of Wtrim
 			     Number of neighbors to retain
 		step   :  the step of binary search to find the partition, default 0.01
@@ -301,6 +302,7 @@ class JSNMF:
 		need to be adjusted then, like step, seed and upper
 
 		'''
+		S = self.result['S']
 		A = Wtrim(S, K = 50)
 		A = A.numpy()
 
@@ -315,7 +317,7 @@ class JSNMF:
 		res_clu = None
 
 
-		#use binary search to find the corret gamma parameter
+		# use binary search to find the corret gamma parameter
 		while True:
 			if tmp_c == num_c:
 				res_clu = tmp_clu
@@ -336,14 +338,13 @@ class JSNMF:
 
 		return res_clu
 
-	def visualize(self, S, label, tag = False, **kwarg):
+	def visualize(self, label, tag = False, **kwarg):
 
 		'''
 		Visualize based on the complete graph S using Umap
 
 		Parameters
 		----------
-		S         : (N, N) np.ndarray, the complete graph
 		label     : array, true or clustered (louvain result) labels for each cell
 		tag		  : if recalculte umap embedding
 		**kwarg   : kwarg for the umap 	    
@@ -355,7 +356,8 @@ class JSNMF:
 		'''
 
 
-		#transfer S to distance matrix first
+		# transfer S to distance matrix first
+		S = self.result['S']
 		data = 1-S
 		data = data-np.diag(data.diagonal())
 		reducer = umap.UMAP(**kwarg)
@@ -372,12 +374,68 @@ class JSNMF:
 			self.embedding = embedding
 
 
-		#plt.figure(figsize=(3, 1.5), dpi=300)
-		#visualize
+		# plt.figure(figsize=(3, 1.5), dpi=300)
+		# visualize
 		for i in range(1,label.max() + 1):
 			ind = label == i
 			rgb = (random.random(), random.random() /2, random.random()/2)
 			plt.scatter(self.embedding[ind, 0],self.embedding[ind, 1], s = 1.5, label = i,color = rgb)
 		plt.legend(ncol=2,bbox_to_anchor=(1, 1.2))
 		plt.show()
+
+	def enrich_analysis(self, genes = None, peaks = None, topk_gene = 200, topk_peak = 1000,
+							folder = 'h3k4'):
+		'''
+		Parameters
+		----------
+		genes     : gene names, if not none, save the factors for gene enrichment analysis
+		peaks	  : peaks names, if not none, save the factors for region enrichment analysis
+		topk_gene : number of top genes for each factor, default 200
+		topk_peak : number of top peak for each factor, default 1000
+		folder    : the name of the folder to save the results
+
+		Returns
+		-------
+		saved files containing factors for  
 		
+		'''
+		
+		
+		if genes is not None:
+			path = folder +'/W1'
+			if not os.path.exists(path):
+				os.makedirs(path)
+			W1 = self.result['W1']
+			nfactor = W1.shape[1]
+			sorted, indices = torch.sort(W1,dim = 0,descending=True)
+			print('Start writing factors for gene enrichment analysis')
+			for i in range(nfactor):
+				tmp_dict = {'gene symbol':genes[indices[:topk_gene,i]]}
+				tmp_pd = pd.DataFrame(tmp_dict)
+				tmp_pd.to_csv(folder + '/W1/factor_' + str(i+1) + '.csv',index = False)
+				print('Successfully write factor_' + str(i+1) + ' for gene enrichment analysis')
+			print('done')
+			print()
+
+
+		if peaks is not None:
+			path = folder +'/W2'
+			if not os.path.exists(path):
+				os.makedirs(path)
+			W2 = self.result['W2']
+			nfactor = W2.shape[1]
+			sorted, indices = torch.sort(W2,dim = 0,descending=True)
+			print('Start writing factors for region enrichment analysis')
+			for i in range(nfactor):
+				tmp_dict = {'peak loc':peaks[indices[:topk_peak,i]]}
+				tmp_pd = pd.DataFrame(tmp_dict)
+				tmp_pd.to_csv(folder + '/W2/factor_' + str(i+1) + '.csv')
+				print('Successfully write factor_' + str(i+1) + ' for region enrichment analysis')
+			
+			print('done')
+
+
+		
+
+
+
