@@ -18,11 +18,11 @@ test_model = JSNMF(rna,atac)
 ```
 After initializing, run the model is also quite easy: 
 ```
-result = test_model.run()
+test_model.run()
 ```
 The `result` is a dict, and the major output of JSNMF, the complete graph S, can be get with easy access:
 ```
-S = result['S']
+S = test_model.result['S']
 ```
 `JSNMF` class also has other methods, you can use the `help` or `?` command for more details explanations of the methods.
 
