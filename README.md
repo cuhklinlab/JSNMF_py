@@ -20,7 +20,7 @@ After initializing, run the model is also quite easy:
 ```
 test_model.run()
 ```
-The `result` is a dict, and the major output of JSNMF, the complete graph S, can be get with easy access:
+The result is saved in `test_model.result`, which is a dict, and the major output of JSNMF, the complete graph S, can be get with easy access:
 ```
 S = test_model.result['S']
 ```
