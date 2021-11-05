@@ -11,7 +11,7 @@ pip install JSNMF-py
 ```
 
 ## 2. Usage
-The main class `JSNMF` needs to be initialized with at least two [annda.AnnData](https://anndata.readthedocs.io/en/latest/anndata.AnnData.html#anndata.AnnData) object, for`RNA`, and `ATAC` data, or data from two modalities, respectively. The preprocessed data is stored in `RNA.X` and `ATAC.X`. And the true cell labels should be kept in `RNA.obs['celltype']`. Note that the data preprocessing process is done with R. The default number of maximum epochs to run, i.e. the `max_epochs` parameter, is set as 200. So it is quite simple to initialize a JSNMF model with the following code:
+The main class `JSNMF` needs to be initialized with at least two [anndata.AnnData](https://anndata.readthedocs.io/en/latest/anndata.AnnData.html#anndata.AnnData) object, for`RNA`, and `ATAC` data, or data from two modalities, respectively. The preprocessed data is stored in `RNA.X` and `ATAC.X`. And the true cell labels should be kept in `RNA.obs['celltype']`. Note that the data preprocessing process is done with R. The default number of maximum epochs to run, i.e. the `max_epochs` parameter, is set as 200. So it is quite simple to initialize a JSNMF model with the following code:
 ```
 from JSNMF.model import JSNMF
 test_model = JSNMF(rna,atac)
