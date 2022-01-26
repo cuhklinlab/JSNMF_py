@@ -28,4 +28,4 @@ S = test_model.result['S']
 
 
 ## 3. Tutorials
-Please refer to [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Tutorials/jsnmf_tutorial.ipynb) for a simple illustration of the use of JSNMF model, with clustering and visualization results shown. The guide for obtaining the gene-peak association can be found [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Tutorials/Gene_Assoc_Tutorial.md). And the tutorial of using some extensions or variants of JSNMF model is [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Tutorials/var_jsnmf_tutorial.md). 
+Please refer to [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Tutorials/jsnmf_tutorial.ipynb) for a simple illustration of the use of JSNMF model, with clustering and visualization results shown. The guide for obtaining the gene-peak association can be found [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Tutorials/Gene_Assoc_Tutorial.md). And the tutorial of using some extensions or variants of JSNMF model is [here](https://github.com/cuhklinlab/JSNMF_py/blob/main/Tutorials/var_jsnmf_tutorials.md). 
