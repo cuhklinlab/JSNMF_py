@@ -674,9 +674,62 @@ def compute_obj(X1,X2,S,W1,W2,H1,H2,D1,A1,D2,A2,alpha,gamma,theta1,theta2):
 	return obj
 
 
+def compute_obj_H(X1,X2,W1,W2,H,D1,A1,D2,A2,gamma,theta1,theta2):
+	L1 = D1 - A1
+	L2 = D2 - A2
+	obj = torch.square(torch.norm(X1 - W1 @ H.T))  + torch.square(torch.norm(X2 - W2 @ H.T))
+	obj += gamma * (torch.trace(theta1.square() * H.T @ L1 @ H + theta2.square() * H.T @ L2 @ H ))
+	return obj
+
+
+
+def compute_obj_3(X1,X2,X3, S,W1,W2,W3, H1,H2,H3, D1,A1,D2,A2,D3, A3,alpha,gamma,theta1,theta2, theta3):
+	''' function to comupte the objective for three modalities case to be optimized '''
+	L1 = D1 - A1
+	L2 = D2 - A2
+	L3 = D3 - A3
+	obj = torch.square(torch.norm(X1 - W1 @ H1.T))  + torch.square(torch.norm(X2 - W2 @ H2.T)) + torch.square(torch.norm(X3 - W3 @ H3.T)) 
+	obj = obj + 0.5 * alpha *( torch.square(torch.norm(S - H1@H1.T )) + torch.square(torch.norm(S-H2@H2.T)) + torch.square(torch.norm(S-H3@H3.T)))
+	obj += gamma * (torch.trace(theta1.square() * H1.T @ L1 @ H1 + theta2.square() * H2.T @ L2 @ H2 + theta3.square() * H3.T @ L3 @ H3 ))
+	return obj
 
 
 
 
 
+def cos_opt(X):
+	W  = X@X.T
+	DX = torch.sqrt(torch.diag(W)) @ (torch.sqrt(torch.diag(W)).T)
+	W = W/DX
+	return W
 
+
+
+def compute_obj_5(X11,X12,X21,X23,X31,X34,X41,X45,X51,X56,S1,S2,S3,S4,S5,W1,W2,W3,W4,W5,W6,H11,H12,H21,H23,H31,H34,H41,H45,H51,H56,D11,A11,D12,A12,D21,A21,D23,A23,D31,A31,D34,A34,D41,A41,D45,A45,D51,A51,D56,A56, alpha,gamma,theta11,theta12,theta21,theta23,theta31,theta34,theta41,theta45,theta51,theta56):
+	L11 = D11-A11 
+	L12 = D12-A12
+	L21 = D21-A21
+	L23 = D23-A23
+	L31 = D31-A31
+	L34 = D34-A34
+	L41 = D41-A41
+	L45 = D45-A45
+	L51 = D51-A51
+	L56 = D56-A56
+	obj = torch.square(torch.norm(X11 - W1 @ H11.T)) + torch.square(torch.norm(X12 - W2 @ H12.T))
+	obj += torch.square(torch.norm(X21 - W1 @ H21.T)) + torch.square(torch.norm(X23 - W3 @ H23.T))
+	obj += torch.square(torch.norm(X31 - W1 @ H31.T)) + torch.square(torch.norm(X34 - W4 @ H34.T))
+	obj += torch.square(torch.norm(X41 - W1 @ H41.T)) + torch.square(torch.norm(X45 - W5 @ H45.T))
+	obj += torch.square(torch.norm(X51 - W1 @ H51.T)) + torch.square(torch.norm(X56 - W6 @ H56.T))
+	
+	tmp1 = torch.square(torch.norm(S1 - H11 @ H11.T)) + torch.square(torch.norm(S1 - H12 @ H12.T))
+	tmp1 += torch.square(torch.norm(S2 - H21 @ H21.T)) + torch.square(torch.norm(S2 - H23 @ H23.T))
+	tmp1 += torch.square(torch.norm(S3 - H31 @ H31.T)) + torch.square(torch.norm(S3 - H34 @ H34.T))
+	tmp1 += torch.square(torch.norm(S4 - H41 @ H41.T)) + torch.square(torch.norm(S4 - H45 @ H45.T))
+	tmp1 += torch.square(torch.norm(S5 - H51 @ H51.T)) + torch.square(torch.norm(S5 - H56 @ H56.T))
+	obj += 0.5 * alpha * tmp1
+
+	tmp2 = torch.trace(theta11**2*H11.T@L11@H11+theta12**2*H12.T@L12@H12+theta21**2*H21.T@L21@H21+theta23**2*H23.T@L23@H23)
+	tmp2 += torch.trace(theta31**2*H31.T@L31@H31+theta34**2@H34.T@L34@H34+theta41**2*H41.T@L41@H41+theta45**2*H45.T@L45@H45+ theta51**2*H51.T@L51@H51+theta56**2*H56.T@L56@H56)
+	obj += gamma * tmp2
+	return obj
